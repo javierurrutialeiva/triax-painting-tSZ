@@ -10,8 +10,8 @@ using PhysicalConstants
 using Cosmology
 using MeshGrid
 import DataInterpolations 
-using Base.Threads
-
+using LinearAlgebra
+using StaticArrays
 
 import PhysicalConstants.CODATA2018 as constants
 const M_sun = 1.98847e30u"kg"
