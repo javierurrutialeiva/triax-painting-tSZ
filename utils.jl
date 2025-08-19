@@ -140,3 +140,26 @@ function _nfw_profile_los_quadrature(x, xc, α, β, γ; zmax=1e5, rtol=eps(), or
                       0.0, zmax, rtol=rtol, order=order)
     return 2integral / scale
 end
+
+function radial_profile_arcmin(x, y, data, r_bins, DA)
+
+    factor = 180/π * 60
+    x′ = x ./ DA .* factor
+    y′ = y ./ DA .* factor
+    r = sqrt.(x′.^2 .+ y′.^2)
+    r_flat = vec(r)
+    d_flat = vec(data)
+    profile = zeros(length(r_bins) - 1)
+    @assert length(r_bins) > 1 "Need at least two bins to infer Δr"
+    Δr = r_bins[2] - r_bins[1]
+    profile = similar(r_bins, Float64)
+    for (i, R) in enumerate(r_bins)
+        inds = findall(abs.(r_flat .- R) .< Δr/2)
+        if isempty(inds)
+            profile[i] = NaN
+        else
+            profile[i] = mean(d_flat[inds])
+        end
+    end
+    return profile
+end
