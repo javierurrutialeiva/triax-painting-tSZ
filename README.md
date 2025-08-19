@@ -2,9 +2,9 @@
 Painting algorithm to N-body simulation using a GNFW profile with triaxiality. Equations were partially obtained from [Kim et al 2025](https://arxiv.org/abs/2307.04794) to define elliptical coordinates. y-profile is completelly based on [Battaglia et al 2016](https://iopscience.iop.org/article/10.1088/0004-637X/758/2/75/pdf)
 ## Projected ellipsoidal coordinates:
 Ellipsodial radius is given by:
-$$
+$
 \zeta^2 = \sqrt{\frac{\hat{x}^2_1}{q_1^2} + \frac{\hat{x}^2_2}{q_2^2} + \hat{x}^3_2}
-$$
+$
 Prolate if $q_1 = q_2 \leq 1$ and oblate if $q_1 \leq q_2 = 1$. 
 #### Euler angles 
 $(x^1_{\mathrm{int}}, x^2_{\mathrm{int}}, x^3_{\mathrm{int}})\rightarrow (x^1_{\mathrm{obs}}, x^2_{\mathrm{obs}}, x^3_{\mathrm{obs}})$. There are three angles:
