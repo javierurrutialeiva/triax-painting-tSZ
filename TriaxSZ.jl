@@ -14,8 +14,12 @@ using LinearAlgebra
 using Statistics
 using StaticArrays
 using SkyCoords
-
+using Printf
+using JLD2, FileIO
+using Pixell
+using XGPaint
 import PhysicalConstants.CODATA2018 as constants
+using Roots
 
 const M_sun = 1.98847e30u"kg"
 const T_cmb =  2.725 * u"K"

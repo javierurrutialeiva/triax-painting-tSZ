@@ -1,3 +1,32 @@
+
+struct CarClenshawCurtisProfileWorkspace{T,A<:AbstractArray{T,2}} <: AbstractProfileWorkspace{T}
+    sin_α::A
+    cos_α::A
+    sin_δ::A
+    cos_δ::A
+end
+
+function profileworkspace(shape, wcs::CarClenshawCurtis)
+    α_map, δ_map = posmap(shape, wcs)
+    return CarClenshawCurtisProfileWorkspace(
+        sin.(α_map), cos.(α_map), sin.(δ_map), cos.(δ_map))
+end
+
+
+struct GnomonicProfileWorkspace{T,A<:AbstractArray{T,2}} <: AbstractProfileWorkspace{T}
+    sin_α::A
+    cos_α::A
+    sin_δ::A
+    cos_δ::A
+end
+
+function profileworkspace(shape, wcs::Gnomonic)
+    α_map, δ_map = posmap(shape, wcs)
+    return GnomonicProfileWorkspace(
+        sin.(α_map), cos.(α_map), sin.(δ_map), cos.(δ_map))
+end
+
+
 abstract type AbstractProfileWorkspace{T} end
 abstract type AbstractProfile{T} end
 abstract type AbstractGNFW{T} <: AbstractProfile{T} end
@@ -104,6 +133,11 @@ function build_z2r_interpolator(min_z::T, max_z::T,
     return z2r
 end
 
+function compute_θmax(model::AbstractProfile{T}, M_Δ, z; mult=4) where T
+    r = R_Δ(model, M_Δ, z)
+    return T(mult * angular_size(model, r, z))
+end
+
 function euler_rotation_matrix(θ, φ, ψ)
     Rzϕ = @SMatrix[
         cos(φ)  -sin(φ)   0
@@ -116,9 +150,9 @@ function euler_rotation_matrix(θ, φ, ψ)
            0   sin(θ)    cos(θ)
     ]
     Rzψ = @SMatrix[
-        cos(ψ)  -sin(ψ)   0
-        sin(ψ)   cos(ψ)   0
-           0        0     1
+        cos(ψ)      0     -sin(ψ) 
+        0           1     0
+        sin(ψ)       0    cos(ψ)
     ]
 
     return Rzψ * Rxθ * Rzϕ
@@ -163,3 +197,26 @@ function radial_profile_arcmin(x, y, data, r_bins, DA)
     end
     return profile
 end
+
+function uniform(a,b)
+    return rand()*(b - a) + a
+end
+
+function uniform_list(a, b, N::Int = 100)
+    r = collect([uniform(a,b) for n in 1:N])
+    return r
+end
+
+function random_catalog(N::Int = 100, ra_min = -4, ra_max = 4, dec_min = -2.5, dec_max = 2.5)
+    ra, dec = uniform_list(ra_min, ra_max, N), uniform_list(dec_min, dec_max, N)
+    Mass = uniform_list(1e14, 5e15, N)
+    z = uniform_list(0.01, 2, N)
+    ϵ₁ = uniform_list(0.01, 0.5, N)
+    ϵ₂ = uniform_list(0.01, 0.5, N)
+    return ra, dec, Mass, z
+end
+
+compute_θmin(model::AbstractInterpolatorProfile) = exp(first(first(model.itp.ranges)))
+compute_θmin(::AbstractProfile{T}) where T = eps(T) 
+
+
